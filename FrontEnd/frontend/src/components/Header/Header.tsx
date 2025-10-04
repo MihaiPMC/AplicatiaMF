@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ user, isAuthenticated, onLogin, onLogou
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
-          <img src="/logo.svg" alt="Logo" className={styles.logoImage} />
+          <img src="/logo512.png" alt="Logo" className={styles.logoImage} />
           <span className={styles.logoText}>MF-App</span>
         </div>
 
