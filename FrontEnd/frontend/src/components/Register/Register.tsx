@@ -100,7 +100,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onShowLogin, onReturnHo
             className={styles.homeButton}
             type="button"
           >
-            ← Return to Home
+            Return to Home
           </button>
         )}
 

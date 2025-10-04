@@ -169,30 +169,44 @@
 
 .homeButton {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: none;
-  border: none;
-  color: #6b7280;
+  top: -4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .homeButton:hover {
-  color: #3b82f6;
-  background-color: #f3f4f6;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.homeButton:active {
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Mobile responsiveness */
 @media (max-width: 480px) {
   .registerContainer {
     padding: 0.5rem;
+    padding-top: 5rem;
   }
 
   .registerCard {
@@ -204,8 +218,20 @@
   }
 
   .homeButton {
-    position: static;
-    margin-bottom: 1rem;
-    align-self: flex-start;
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+  }
+
+  .homeButton:hover {
+    transform: translateX(-50%) translateY(-1px);
+  }
+
+  .homeButton:active {
+    transform: translateX(-50%) translateY(0);
   }
 }
