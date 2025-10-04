@@ -155,15 +155,15 @@
 
 /* Hamburger animation when menu is open */
 @media (max-width: 768px) {
-  .navOpen ~ .hamburger .hamburgerLine:nth-child(1) {
+  .hamburger.hamburgerOpen .hamburgerLine:nth-child(1) {
     transform: rotate(45deg) translate(5px, 5px);
   }
 
-  .navOpen ~ .hamburger .hamburgerLine:nth-child(2) {
+  .hamburger.hamburgerOpen .hamburgerLine:nth-child(2) {
     opacity: 0;
   }
 
-  .navOpen ~ .hamburger .hamburgerLine:nth-child(3) {
+  .hamburger.hamburgerOpen .hamburgerLine:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -6px);
   }
 }
