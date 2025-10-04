@@ -95,7 +95,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onShowRegister, onReturnHome }) 
             className={styles.homeButton}
             type="button"
           >
-            ← Return to Home
+            Return to Home
           </button>
         )}
 
