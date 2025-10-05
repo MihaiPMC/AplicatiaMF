@@ -7,6 +7,18 @@
     <a routerLink="/interactions" routerLinkActive="active">Interactions</a>
   </div>
   <div class="spacer"></div>
+
+  <!-- Auth area -->
+  <div *ngIf="!isAuthed(); else authed" class="actions">
+    <a routerLink="/login" routerLinkActive="active">Login</a>
+    <a routerLink="/register" class="btn btn-primary">Register</a>
+  </div>
+  <ng-template #authed>
+    <div class="actions">
+      <span class="user-name">{{ displayName() }}</span>
+      <button class="btn btn-link" (click)="logout()">Logout</button>
+    </div>
+  </ng-template>
 </nav>
 
 <main class="container">

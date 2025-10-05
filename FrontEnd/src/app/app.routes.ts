@@ -21,5 +21,13 @@ export const routes: Routes = [
     path: 'interactions',
     loadComponent: () => import('./pages/interactions/interactions.component').then(m => m.InteractionsComponent)
   },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent)
+  },
   { path: '**', redirectTo: '' }
 ];
