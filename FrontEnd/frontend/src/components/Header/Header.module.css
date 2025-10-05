@@ -32,6 +32,11 @@
   cursor: pointer;
 }
 
+.logoButton:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+  /* You can adjust color and thickness for your design */
+}
 .logoText {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   background-clip: text;
