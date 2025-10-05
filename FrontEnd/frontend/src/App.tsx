@@ -3,8 +3,9 @@ import './App.css';
 import Header, { User } from './components/Header/Header';
 import Login, { LoginFormData } from './components/Login/Login';
 import Register, { RegisterFormData } from './components/Register/Register';
+import Templates from './components/Templates/Templates';
 
-type AppView = 'home' | 'login' | 'app' | 'register';
+type AppView = 'home' | 'login' | 'app' | 'register' | 'templates';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('home');
@@ -60,6 +61,18 @@ function App() {
     setCurrentView('home');
   };
 
+  const handleShowTemplates = () => {
+    setCurrentView('templates');
+  };
+
+  const handleShowDashboard = () => {
+    setCurrentView('app');
+  };
+
+  const handleShowHome = () => {
+    setCurrentView('home');
+  };
+
   if (currentView === 'home') {
     return (
       <div className="App">
@@ -69,6 +82,17 @@ function App() {
           onLogin={handleShowLogin}
           onLogout={handleLogout}
         />
+        <nav className="app-nav">
+          <button onClick={handleShowHome} className="nav-btn active">
+            Home
+          </button>
+          <button onClick={handleShowDashboard} className="nav-btn">
+            Dashboard
+          </button>
+          <button onClick={handleShowTemplates} className="nav-btn">
+            Templates
+          </button>
+        </nav>
         <main className="home-container">
           <div className="hero-section">
             <h1 className="hero-title">Welcome to MF-App</h1>
@@ -128,6 +152,31 @@ function App() {
     );
   }
 
+  if (currentView === 'templates') {
+    return (
+      <div className="App">
+        <Header
+          user={user}
+          isAuthenticated={isAuthenticated}
+          onLogin={handleShowLogin}
+          onLogout={handleLogout}
+        />
+        <nav className="app-nav">
+          <button onClick={handleShowHome} className="nav-btn">
+            Home
+          </button>
+          <button onClick={handleShowDashboard} className="nav-btn">
+            Dashboard
+          </button>
+          <button onClick={handleShowTemplates} className="nav-btn active">
+            Templates
+          </button>
+        </nav>
+        <Templates userRole={user?.role || 'volunteer'} />
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <Header
@@ -136,14 +185,36 @@ function App() {
         onLogin={handleShowLogin}
         onLogout={handleLogout}
       />
+      <nav className="app-nav">
+        <button onClick={handleShowHome} className="nav-btn">
+          Home
+        </button>
+        <button onClick={handleShowDashboard} className="nav-btn active">
+          Dashboard
+        </button>
+        <button onClick={handleShowTemplates} className="nav-btn">
+          Templates
+        </button>
+      </nav>
       <main style={{ padding: '2rem' }}>
         <h1>Welcome to MyApp</h1>
         <p>
-          Hello {user?.name}! You are logged in as a {user?.role}.
+          {isAuthenticated ? (
+            <>Hello {user?.name}! You are logged in as a {user?.role}.</>
+          ) : (
+            <>Welcome! You can browse the application features. Sign in to unlock full functionality.</>
+          )}
         </p>
         <div style={{ marginTop: '1rem', color: '#6b7280' }}>
-          <p>Available navigation options depend on your role:</p>
+          <p>Available navigation options{isAuthenticated ? ' depend on your role' : ''}:</p>
           <ul style={{ textAlign: 'left', maxWidth: '400px', margin: '0.5rem auto' }}>
+            {!isAuthenticated && (
+              <>
+                <li>Home - Welcome page and overview</li>
+                <li>Dashboard - Application overview (limited access)</li>
+                <li>Templates - Browse email templates (read-only)</li>
+              </>
+            )}
             {user?.role === 'volunteer' && (
               <>
                 <li>Dashboard - View your assignments</li>
