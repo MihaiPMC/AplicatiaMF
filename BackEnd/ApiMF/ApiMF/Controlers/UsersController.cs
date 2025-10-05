@@ -4,6 +4,7 @@ using ApiMF.Data;
 using ApiMF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql; // for PostgresException
 
 namespace ApiMF.Controlers;
 
@@ -31,7 +32,6 @@ public class UsersController : ControllerBase
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Email = u.Email,
-                PasswordHash = u.PasswordHash,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt
             })
@@ -82,7 +82,7 @@ public class UsersController : ControllerBase
         if (!ModelState.IsValid)
             return ValidationProblem(ModelState);
 
-        // Ensure email is unique (best-effort; DB constraint should enforce for true safety)
+        // Best-effort check to provide a nicer error before hitting DB constraint
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         var emailExists = await _db.Users.AnyAsync(u => u.Email == normalizedEmail);
         if (emailExists)
@@ -99,11 +99,19 @@ public class UsersController : ControllerBase
             LastName = request.LastName.Trim(),
             Email = normalizedEmail,
             PasswordHash = passwordHash,
-            // CreatedAt / UpdatedAt are database-generated defaults
         };
 
         _db.Users.Add(user);
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+        {
+            // Handle race conditions where another request inserted the same email concurrently
+            ModelState.AddModelError(nameof(request.Email), "A user with this email already exists.");
+            return ValidationProblem(ModelState);
+        }
 
         var dto = new UserDto
         {
@@ -116,6 +124,12 @@ public class UsersController : ControllerBase
         };
 
         return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, dto);
+    }
+
+    private static bool IsUniqueViolation(DbUpdateException ex)
+    {
+        // PostgreSQL unique violation SQLSTATE code is 23505
+        return ex.InnerException is PostgresException pg && pg.SqlState == PostgresErrorCodes.UniqueViolation;
     }
 
     private static string HashPasswordPbkdf2(string password)
@@ -152,7 +166,6 @@ public class UsersController : ControllerBase
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
