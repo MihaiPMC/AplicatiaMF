@@ -4,6 +4,7 @@ using ApiMF.Models.Dtos;
 using ApiMF.Application.Users.Commands.CreateUser;
 using ApiMF.Application.Users.Queries.GetUsers;
 using ApiMF.Application.Users.Queries.GetUserById;
+using ApiMF.Application.Users.Queries.LoginUser;
 
 namespace ApiMF.Controllers;
 
@@ -77,11 +78,39 @@ public class UsersController : ControllerBase
         }
     }
 
+    // POST: api/users/login
+    [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<UserDto>> Login([FromBody] LoginRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            ModelState.AddModelError(nameof(request.Email), "Email is required.");
+        if (string.IsNullOrWhiteSpace(request.Password))
+            ModelState.AddModelError(nameof(request.Password), "Password is required.");
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var user = await _mediator.Send(new LoginUserQuery(request.Email, request.Password));
+        if (user == null)
+            return Unauthorized();
+
+        return Ok(user);
+    }
+
     // DTO for input only
     public class CreateUserRequest
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class LoginRequest
+    {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
