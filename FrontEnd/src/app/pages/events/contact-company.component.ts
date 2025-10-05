@@ -70,13 +70,27 @@ export class ContactCompanyComponent {
     scheduledAt: ['', [Validators.required]], // datetime-local string
   });
 
+  // Bridge form control -> signals so computed previews update
+  private readonly selectedTemplateId = signal<number | null>(null);
+
   readonly hasContacts = computed(() => this.companyEmails().length > 0);
-  readonly selectedTemplate = computed(() => this.templates().find(t => t.id === this.form.controls.templateId.value) || null);
+  readonly selectedTemplate = computed(() => {
+    const sel = this.selectedTemplateId();
+    return this.templates().find(t => String(t.id) === String(sel)) || null;
+  });
   readonly templateSubject = computed(() => extractTemplateSubject(this.selectedTemplate()));
   readonly templateContent = computed(() => extractTemplateContent(this.selectedTemplate()));
   readonly templateCc = computed(() => extractTemplateCc(this.selectedTemplate()));
 
   constructor() {
+    // Initialize selected template id from form value
+    const initialTid = this.form.controls.templateId.value;
+    this.selectedTemplateId.set(initialTid != null ? Number(initialTid) : null);
+    // Reflect changes from the select into the signal
+    this.form.controls.templateId.valueChanges.subscribe((id) => {
+      this.selectedTemplateId.set(id != null ? Number(id) : null);
+    });
+
     this.route.paramMap.subscribe(pm => {
       const id = pm.get('id');
       const t = pm.get('eventTypeId');
@@ -138,7 +152,9 @@ export class ContactCompanyComponent {
           this.form.controls.to.setValue(emails[0]);
         }
         if (normalizedTemplates.length && !this.form.controls.templateId.value) {
-          this.form.controls.templateId.setValue(normalizedTemplates[0].id);
+          const firstId = normalizedTemplates[0].id as any;
+          this.form.controls.templateId.setValue(firstId as any);
+          this.selectedTemplateId.set(firstId != null ? Number(firstId) : null);
         }
         if (!this.form.controls.scheduledAt.value) {
           const dt = new Date(Date.now() + 5 * 60 * 1000);
@@ -168,7 +184,7 @@ export class ContactCompanyComponent {
     }
 
     const { to, templateId, scheduledAt } = this.form.getRawValue();
-    const t = this.templates().find(x => x.id === templateId);
+    const t = this.templates().find(x => String(x.id) === String(templateId));
     if (!t) {
       this.error.set('Please choose a template.');
       return;
