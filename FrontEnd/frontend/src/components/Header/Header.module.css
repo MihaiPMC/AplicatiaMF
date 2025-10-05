@@ -20,15 +20,16 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   font-weight: 600;
   font-size: 1.25rem;
   color: #1f2937;
 }
 
-.logoImage {
-  width: 32px;
-  height: 32px;
+.logoButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .logoText {
@@ -37,7 +38,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 800;
-    font-size: 2rem;
+  font-size: 2rem;
 }
 
 .nav {
