@@ -1,6 +1,7 @@
 {
-  "name": "front-end",
+  "name": "mailflow",
   "version": "0.0.0",
+  "description": "MailFlow – Event outreach, company relationship & interaction tracking UI.",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

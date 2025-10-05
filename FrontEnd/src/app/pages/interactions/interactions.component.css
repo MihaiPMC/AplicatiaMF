@@ -1,11 +1,4 @@
 /* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/interactions/interactions.component.css */
 .page { max-width: 800px; margin: 2rem auto; }
 /* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/login/login.component.css */
-.auth-form { max-width: 420px; margin: 2rem auto; }
-.auth-form form { display: grid; gap: 0.75rem; }
-.auth-form label { display: grid; gap: 0.25rem; font-weight: 500; }
-.auth-form input { padding: 0.6rem 0.7rem; border: 1px solid #d1d5db; border-radius: 6px; }
-.btn.primary { background: #2563eb; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; }
-.error { color: #b91c1c; }
-.alt { margin-top: 0.5rem; }
 
