@@ -29,7 +29,7 @@ const Templates: React.FC<TemplatesProps> = ({ userRole }) => {
   });
 
   const categories: TemplateCategory[] = ['IT', 'Barter', 'Awards', 'Foundations'];
-  const canEdit = true; // Allow everyone to add templates for now
+  const canEdit = userRole === 'admin' || userRole === 'manager';
 
   const filteredTemplates = templates.filter(template => template.category === activeCategory);
 
