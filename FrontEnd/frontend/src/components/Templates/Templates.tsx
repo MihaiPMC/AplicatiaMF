@@ -49,7 +49,7 @@ const Templates: React.FC<TemplatesProps> = ({ userRole }) => {
     } else {
       // Add new template
       const newTemplate: EmailTemplate = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         name: currentTemplate.name!,
         subject: currentTemplate.subject!,
         body: currentTemplate.body!,
