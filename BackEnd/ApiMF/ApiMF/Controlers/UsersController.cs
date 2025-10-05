@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql; // for PostgresException
 
-namespace ApiMF.Controlers;
+namespace ApiMF.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
