@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header, { User } from './components/Header/Header';
 import Login, { LoginFormData } from './components/Login/Login';
@@ -19,33 +19,50 @@ function App() {
     'volunteer@example.com': { role: 'volunteer', name: 'Volunteer User' }
   };
 
+  useEffect(() => {
+    // Restore auth on load
+    try {
+      const stored = localStorage.getItem('authUser');
+      if (stored) {
+        const parsed: User = JSON.parse(stored);
+        setIsAuthenticated(true);
+        setUser(parsed);
+      }
+    } catch {}
+  }, []);
+
   const handleLogin = (loginData: LoginFormData) => {
-    const userData = mockUsers[loginData.email];
-    if (userData) {
-      setIsAuthenticated(true);
-      setUser({
-        id: '1',
-        name: userData.name,
-        role: userData.role
-      });
-      setCurrentView('app');
-    }
+    // Derive a display name from email if backend name is not available
+    const derivedName = loginData.email.split('@')[0];
+    const userObj: User = {
+      id: 'me',
+      name: derivedName,
+      role: 'volunteer'
+    };
+    setIsAuthenticated(true);
+    setUser(userObj);
+    localStorage.setItem('authUser', JSON.stringify(userObj));
+    setCurrentView('app');
   };
 
   const handleRegister = (registerData: RegisterFormData) => {
     // Mock registration success
-    setIsAuthenticated(true);
-    setUser({
-      id: '2',
+    const userObj: User = {
+      id: 'me',
       name: registerData.email.split('@')[0],
-      role: 'volunteer' // All new users start as volunteers
-    });
+      role: 'volunteer'
+    };
+    setIsAuthenticated(true);
+    setUser(userObj);
+    localStorage.setItem('authUser', JSON.stringify(userObj));
     setCurrentView('app');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUser(undefined);
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('authToken');
     setCurrentView('login');
   };
 
@@ -73,9 +90,32 @@ function App() {
     setCurrentView('home');
   };
 
+  const renderUserBadge = () => {
+    if (!isAuthenticated || !user?.name) return null;
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 12,
+          right: 12,
+          background: '#111827',
+          color: '#ffffff',
+          padding: '8px 12px',
+          borderRadius: 12,
+          fontSize: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 1000
+        }}
+      >
+        {user.name}
+      </div>
+    );
+  };
+
   if (currentView === 'home') {
     return (
       <div className="App">
+        {renderUserBadge()}
         <Header
           user={user}
           isAuthenticated={isAuthenticated}
@@ -138,27 +178,34 @@ function App() {
 
   if (currentView === 'login') {
     return (
-      <Login
-        onLogin={handleLogin}
-        onShowRegister={handleShowRegister}
-        onReturnHome={handleReturnHome}
-      />
+      <>
+        {renderUserBadge()}
+        <Login
+          onLogin={handleLogin}
+          onShowRegister={handleShowRegister}
+          onReturnHome={handleReturnHome}
+        />
+      </>
     );
   }
 
   if (currentView === 'register') {
     return (
-      <Register
-        onRegister={handleRegister}
-        onShowLogin={handleShowLogin}
-        onReturnHome={handleReturnHome}
-      />
+      <>
+        {renderUserBadge()}
+        <Register
+          onRegister={handleRegister}
+          onShowLogin={handleShowLogin}
+          onReturnHome={handleReturnHome}
+        />
+      </>
     );
   }
 
   if (currentView === 'templates') {
     return (
       <div className="App">
+        {renderUserBadge()}
         <Header
           user={user}
           isAuthenticated={isAuthenticated}
@@ -184,6 +231,7 @@ function App() {
 
   return (
     <div className="App">
+      {renderUserBadge()}
       <Header
         user={user}
         isAuthenticated={isAuthenticated}

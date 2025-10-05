@@ -56,19 +56,38 @@ const Login: React.FC<LoginProps> = ({ onLogin, onShowRegister, onReturnHome }) 
     setErrors({});
 
     try {
-      // Mock authentication - simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const res = await fetch('http://localhost:5146/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
 
-      // Mock validation - in real app, this would be handled by your backend
-      if (formData.email === 'admin@example.com' && formData.password === 'password') {
-        onLogin(formData);
-      } else if (formData.email === 'manager@example.com' && formData.password === 'password') {
-        onLogin(formData);
-      } else if (formData.email === 'volunteer@example.com' && formData.password === 'password') {
-        onLogin(formData);
-      } else {
-        setErrors({ general: 'Invalid email or password' });
+      if (!res.ok) {
+        let message = 'Invalid email or password';
+        try {
+          const data = await res.json();
+          if (data?.message) message = data.message;
+        } catch {}
+        setErrors({ general: message });
+        return;
       }
+
+      // Safely parse response (handle 204 No Content as well)
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {}
+
+      // Store token if API returns one
+      if (data?.token) {
+        localStorage.setItem('authToken', data.token);
+      }
+
+      // Notify parent to update app state; parent will handle view navigation
+      onLogin(formData);
     } catch (error) {
       setErrors({ general: 'An error occurred. Please try again.' });
     } finally {

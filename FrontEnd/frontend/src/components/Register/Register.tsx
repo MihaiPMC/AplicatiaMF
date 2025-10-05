@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styles from './Register.module.css';
 
 export interface RegisterFormData {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -14,6 +16,8 @@ export interface RegisterProps {
 }
 
 interface FormErrors {
+  firstName?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
@@ -22,6 +26,8 @@ interface FormErrors {
 
 const Register: React.FC<RegisterProps> = ({ onRegister, onShowLogin, onReturnHome }) => {
   const [formData, setFormData] = useState<RegisterFormData>({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -32,18 +38,22 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onShowLogin, onReturnHo
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-
     if (!formData.password.trim()) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-
     if (!formData.confirmPassword.trim()) {
       newErrors.confirmPassword = 'Password confirmation is required';
     } else if (formData.password !== formData.confirmPassword) {
@@ -65,15 +75,31 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onShowLogin, onReturnHo
     setErrors({});
 
     try {
-      // Mock registration - simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const res = await fetch('http://localhost:5146/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password
+        })
+      });
 
-      // Mock check for existing email
-      if (formData.email === 'existing@example.com') {
-        setErrors({ general: 'An account with this email already exists' });
-      } else {
-        onRegister(formData);
+      if (!res.ok) {
+        let message = 'An error occurred during registration. Please try again.';
+        try {
+          const data = await res.json();
+          if (data?.message) message = data.message;
+        } catch {}
+        setErrors({ general: message });
+        return;
       }
+
+      // Optionally use returned data here
+      // const data = await res.json();
+
+      onRegister(formData);
     } catch (error) {
       setErrors({ general: 'An error occurred during registration. Please try again.' });
     } finally {
@@ -115,6 +141,36 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onShowLogin, onReturnHo
               {errors.general}
             </div>
           )}
+
+          <div className={styles.formGroup}>
+            <label htmlFor="firstName" className={styles.label}>First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              className={`${styles.input} ${errors.firstName ? styles.inputError : ''}`}
+              placeholder="Enter your first name"
+              disabled={isLoading}
+            />
+            {errors.firstName && <span className={styles.fieldError}>{errors.firstName}</span>}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="lastName" className={styles.label}>Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              className={`${styles.input} ${errors.lastName ? styles.inputError : ''}`}
+              placeholder="Enter your last name"
+              disabled={isLoading}
+            />
+            {errors.lastName && <span className={styles.fieldError}>{errors.lastName}</span>}
+          </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>Email</label>
