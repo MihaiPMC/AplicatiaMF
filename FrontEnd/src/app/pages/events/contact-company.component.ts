@@ -10,6 +10,18 @@ interface EmailTemplate {
   subject?: string;
   body?: string;
   description?: string;
+  cc?: string | string[] | null;
+  // ...potential alternate fields from API
+  title?: string;
+  emailSubject?: string;
+  content?: string;
+  html?: string;
+  emailBody?: string;
+  templateBody?: string;
+  emailContent?: string;
+  ccs?: string[] | string | null;
+  ccList?: string[] | string | null;
+  ccEmails?: string[] | string | null;
   [key: string]: any;
 }
 
@@ -51,17 +63,18 @@ export class ContactCompanyComponent {
   readonly templates = signal<EmailTemplate[]>([]);
   readonly companyEmails = signal<string[]>([]);
 
-  // Form
+  // Form (only fields user must provide)
   readonly form = this.fb.nonNullable.group({
     to: ['', [Validators.required, Validators.email]],
     templateId: [0 as number, [Validators.required, Validators.min(1)]],
-    subject: ['', [Validators.required, Validators.minLength(3)]],
-    cc: [''],
-    content: ['', [Validators.required, Validators.minLength(3)]],
     scheduledAt: ['', [Validators.required]], // datetime-local string
   });
 
   readonly hasContacts = computed(() => this.companyEmails().length > 0);
+  readonly selectedTemplate = computed(() => this.templates().find(t => t.id === this.form.controls.templateId.value) || null);
+  readonly templateSubject = computed(() => extractTemplateSubject(this.selectedTemplate()));
+  readonly templateContent = computed(() => extractTemplateContent(this.selectedTemplate()));
+  readonly templateCc = computed(() => extractTemplateCc(this.selectedTemplate()));
 
   constructor() {
     this.route.paramMap.subscribe(pm => {
@@ -81,21 +94,6 @@ export class ContactCompanyComponent {
       this.companyName.set(cn);
       this.eventName.set(en);
       this.eventYear.set(ey ? +ey : null);
-    });
-
-    // When template selection changes, auto-fill subject/content if empty or same as previous template
-    this.form.controls.templateId.valueChanges.subscribe((id) => {
-      if (!id) return;
-      const t = this.templates().find(x => x.id === id);
-      if (!t) return;
-      const subj = (t.subject ?? t.name ?? '').toString().trim();
-      const body = (t.body ?? t.description ?? '').toString().trim();
-      if (!this.form.controls.subject.value) {
-        this.form.controls.subject.setValue(subj);
-      }
-      if (!this.form.controls.content.value) {
-        this.form.controls.content.setValue(body);
-      }
     });
   }
 
@@ -169,8 +167,21 @@ export class ContactCompanyComponent {
       return;
     }
 
-    // We only send the email payload required by the API
-    const { to, subject, cc, content, scheduledAt } = this.form.getRawValue();
+    const { to, templateId, scheduledAt } = this.form.getRawValue();
+    const t = this.templates().find(x => x.id === templateId);
+    if (!t) {
+      this.error.set('Please choose a template.');
+      return;
+    }
+
+    const subject = extractTemplateSubject(t);
+    const content = extractTemplateContent(t);
+    const cc = extractTemplateCc(t);
+    if (!subject || !content) {
+      this.error.set('Selected template is missing subject or content.');
+      return;
+    }
+
     const scheduled = toLocalWithOffset(scheduledAt);
 
     const url = `http://localhost:5146/api/emails/send`;
@@ -221,4 +232,50 @@ function toLocalWithOffset(localInput: string): string {
   const tzH = pad(Math.floor(Math.abs(tzMin) / 60));
   const tzM = pad(Math.abs(tzMin) % 60);
   return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}${sign}${tzH}:${tzM}`;
+}
+
+function extractTemplateSubject(t: EmailTemplate | null | undefined): string {
+  if (!t) return '';
+  const candidates = [t.subject, t.emailSubject, t.title, t.name];
+  for (const v of candidates) {
+    if (typeof v === 'string' && v.trim()) return v.trim();
+  }
+  // Heuristic: find any string prop whose key suggests subject/title/name
+  for (const [k, v] of Object.entries(t)) {
+    if (typeof v === 'string') {
+      const key = k.toLowerCase();
+      if (/(subject|title|name)$/.test(key) && v.trim()) return v.trim();
+    }
+  }
+  return '';
+}
+
+function extractTemplateContent(t: EmailTemplate | null | undefined): string {
+  if (!t) return '';
+  const candidates = [t.body, t.content, t.html, t.emailBody, t.templateBody, t.emailContent, t.description];
+  for (const v of candidates) {
+    if (typeof v === 'string' && v.trim()) return v; // keep HTML as-is
+  }
+  // Heuristic: find any string prop whose key suggests html/body/content/template
+  let fallback = '';
+  for (const [k, v] of Object.entries(t)) {
+    if (typeof v !== 'string') continue;
+    const key = k.toLowerCase();
+    if (/(html|body|content|template)/.test(key)) {
+      // Prefer strings that look like HTML
+      if (/[<>]/.test(v)) return v;
+      // Otherwise keep the first reasonable long text as fallback
+      if (!fallback && v.trim().length >= 10) fallback = v;
+    }
+  }
+  return fallback;
+}
+
+function extractTemplateCc(t: EmailTemplate | null | undefined): string {
+  if (!t) return '';
+  const raw = t.cc ?? t.ccs ?? t.ccList ?? t.ccEmails;
+  if (!raw) return '';
+  if (Array.isArray(raw)) return raw.filter(x => !!x).join(',');
+  if (typeof raw === 'string') return raw;
+  return '';
 }

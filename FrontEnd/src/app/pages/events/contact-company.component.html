@@ -38,23 +38,14 @@
       </label>
       <div class="error" *ngIf="form.controls.templateId.touched && form.controls.templateId.invalid">Please choose a template.</div>
 
-      <label>
-        Subject
-        <input type="text" formControlName="subject" placeholder="Email subject" />
-      </label>
-      <div class="error" *ngIf="form.controls.subject.touched && form.controls.subject.invalid">Please provide a subject.</div>
-
-      <label>
-        CC
-        <input type="text" formControlName="cc" placeholder="email1@domain.com,email2@domain.com" />
-      </label>
-      <p class="helper">Optional. Comma-separated list of emails.</p>
-
-      <label>
-        Content
-        <textarea formControlName="content" rows="10" placeholder="Email HTML content…"></textarea>
-      </label>
-      <div class="error" *ngIf="form.controls.content.touched && form.controls.content.invalid">Please provide the email content.</div>
+      <div class="preview" *ngIf="selectedTemplate() as st">
+        <p><strong>Subject:</strong> {{ templateSubject() || '—' }}</p>
+        <p *ngIf="templateCc()"><strong>CC:</strong> {{ templateCc() }}</p>
+        <div>
+          <label>Content preview</label>
+          <div class="content-preview" [innerHTML]="templateContent() || '<em>No content</em>'"></div>
+        </div>
+      </div>
 
       <label>
         Send at
