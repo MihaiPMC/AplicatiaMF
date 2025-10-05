@@ -33,6 +33,7 @@
               <th scope="col">Emails</th>
               <th scope="col">Phones</th>
               <th scope="col">Notes</th>
+              <th scope="col" style="width:1%">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -57,6 +58,14 @@
               <td>
                 <span *ngIf="c.notes && c.notes.trim().length; else noNotes">{{ c.notes }}</span>
                 <ng-template #noNotes><span class="muted">—</span></ng-template>
+              </td>
+              <td>
+                <a
+                  class="btn btn-primary"
+                  [routerLink]="['/events', eventId(), 'companies', eventTypeId(), 'contact', c.id]"
+                  [queryParams]="{ companyName: c.name, eventName: eventName(), eventYear: eventYear() }"
+                  [class.disabled]="!eventId() || !eventTypeId()"
+                  >Contact</a>
               </td>
             </tr>
           </tbody>

@@ -1,6 +1,8 @@
 using ApiMF.Data;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using ApiMF.Infrastructure.Email;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,10 @@ builder.Services.AddCors(options =>
 
 // Register MediatR handlers in this assembly
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// Email: SMTP settings and sender
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 
 // Remove AutoMapper registration to avoid version compatibility issues
 // builder.Services.AddAutoMapper(typeof(Program).Assembly);

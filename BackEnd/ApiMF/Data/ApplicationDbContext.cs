@@ -24,6 +24,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<ContactType> ContactTypes { get; set; }
 
+    public virtual DbSet<Email> Emails { get; set; }
+
     public virtual DbSet<Event> Events { get; set; }
 
     public virtual DbSet<EventTeamMember> EventTeamMembers { get; set; }
@@ -162,6 +164,21 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.Code).HasColumnName("code");
             entity.Property(e => e.Name).HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Email>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("emails_pkey");
+
+            entity.ToTable("emails", "mf");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Cc).HasColumnName("cc");
+            entity.Property(e => e.Content).HasColumnName("content");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Subject).HasColumnName("subject");
         });
 
         modelBuilder.Entity<Event>(entity =>

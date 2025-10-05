@@ -1,0 +1,68 @@
+<section class="page">
+  <div class="card card--md">
+    <div class="toolbar">
+      <h2>Contact {{ companyName() || 'Company' }}</h2>
+      <div class="actions">
+        <a class="btn btn-outline" [routerLink]="['/events', eventId(), 'companies', eventTypeId()]">Back</a>
+      </div>
+    </div>
+
+    <p class="helper" *ngIf="eventName()">Event: {{ eventName() }}<span *ngIf="eventYear()"> {{ eventYear() }}</span></p>
+
+    <div class="status" *ngIf="loading()">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Loading templates and contacts…</span>
+    </div>
+
+    <div class="status error" *ngIf="!loading() && error() as err">
+      <span>{{ err }}</span>
+      <button class="btn btn-outline" (click)="retry()">Try again</button>
+    </div>
+
+    <form *ngIf="!loading() && !error()" [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        To
+        <input type="email" formControlName="to" [attr.list]="hasContacts() ? 'emailsList' : null" placeholder="contact@company.com" />
+        <datalist id="emailsList" *ngIf="hasContacts()">
+          <option *ngFor="let e of companyEmails()" [value]="e">{{ e }}</option>
+        </datalist>
+      </label>
+      <div class="error" *ngIf="form.controls.to.touched && form.controls.to.invalid">Please provide a valid email.</div>
+
+      <label>
+        Email template
+        <select formControlName="templateId">
+          <option [ngValue]="0" disabled>Select a template…</option>
+          <option *ngFor="let t of templates(); trackBy: trackByTemplateId" [ngValue]="t.id">{{ t.name || t.subject || ('Template #' + t.id) }}</option>
+        </select>
+      </label>
+      <div class="error" *ngIf="form.controls.templateId.touched && form.controls.templateId.invalid">Please choose a template.</div>
+
+      <label>
+        Subject
+        <input type="text" formControlName="subject" placeholder="Email subject" />
+      </label>
+      <div class="error" *ngIf="form.controls.subject.touched && form.controls.subject.invalid">Please provide a subject.</div>
+
+      <label>
+        CC
+        <input type="text" formControlName="cc" placeholder="email1@domain.com,email2@domain.com" />
+      </label>
+      <p class="helper">Optional. Comma-separated list of emails.</p>
+
+      <label>
+        Content
+        <textarea formControlName="content" rows="10" placeholder="Email HTML content…"></textarea>
+      </label>
+      <div class="error" *ngIf="form.controls.content.touched && form.controls.content.invalid">Please provide the email content.</div>
+
+      <label>
+        Send at
+        <input type="datetime-local" formControlName="scheduledAt" />
+      </label>
+      <div class="error" *ngIf="form.controls.scheduledAt.touched && form.controls.scheduledAt.invalid">Please set a date and time.</div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="loading()">{{ loading() ? 'Scheduling…' : 'Schedule email' }}</button>
+    </form>
+  </div>
+</section>
