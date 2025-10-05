@@ -92,6 +92,9 @@ function App() {
               <div className="feature-card">
                 <div className="feature-icon">📝</div>
                 <h3>Template System</h3>
+                <p className="feature-description">
+                  Create, customize, and manage reusable templates to standardize your workflow and save time.
+                </p>
               </div>
               <div className="feature-card">
                 <div className="feature-icon">🏢</div>
