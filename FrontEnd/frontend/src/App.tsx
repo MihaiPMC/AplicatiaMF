@@ -90,19 +90,19 @@ function App() {
             <h2 className="features-title">Key Features</h2>
             <div className="features-grid">
               <div className="feature-card">
-                <div className="feature-icon">📊</div>
-                <h3>Dashboard Analytics</h3>
-                <p>Comprehensive overview of your data and activities with real-time insights.</p>
+                <div className="feature-icon">📝</div>
+                <h3>Template System</h3>
+                <p className="feature-description">
+                  Create, customize, and manage reusable templates to standardize your workflow and save time.
+                </p>
               </div>
               <div className="feature-card">
                 <div className="feature-icon">🏢</div>
                 <h3>Firm Management</h3>
-                <p>Organize and manage company information efficiently across your organization.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">📝</div>
-                <h3>Template System</h3>
-                <p>Create, customize, and manage form templates for consistent data collection.</p>
+                <div className="feature-icon">📧</div>
+                <h3>Email Automation</h3>
               </div>
             </div>
           </div>
