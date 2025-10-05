@@ -1,0 +1,70 @@
+<section class="page">
+  <div class="card">
+    <div class="toolbar">
+      <div>
+        <h2>
+          Companies for {{ eventName() || 'Event' }}<span *ngIf="eventYear()"> {{ eventYear() }}</span>
+        </h2>
+        <p class="helper" *ngIf="eventTypeLabel()">Event type: {{ eventTypeLabel() }}</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-outline" routerLink="/events">Back to events</a>
+        <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="status" *ngIf="loading()">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Loading companies…</span>
+    </div>
+
+    <div class="status error" *ngIf="!loading() && error() as err">
+      <span>Failed to load companies: {{ err }}</span>
+      <button class="btn btn-outline" (click)="load()">Try again</button>
+    </div>
+
+    <div *ngIf="!loading() && !error()">
+      <div class="table-wrapper" *ngIf="companies().length; else empty">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Company</th>
+              <th scope="col">Website</th>
+              <th scope="col">Emails</th>
+              <th scope="col">Phones</th>
+              <th scope="col">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of companies(); trackBy: trackById">
+              <td class="name">{{ c.name }}</td>
+              <td>
+                <a *ngIf="c.website; else noWeb" [href]="c.website!" target="_blank" rel="noopener">{{ c.website }}</a>
+                <ng-template #noWeb><span class="muted">—</span></ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="contactEmails()[c.id]?.length; else noEmails">
+                  <a class="chip" *ngFor="let email of contactEmails()[c.id]" [href]="'mailto:' + email">{{ email }}</a>
+                </ng-container>
+                <ng-template #noEmails><span class="muted">—</span></ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="contactPhones()[c.id]?.length; else noPhones">
+                  <a class="chip" *ngFor="let phone of contactPhones()[c.id]" [href]="'tel:' + phone">{{ phone }}</a>
+                </ng-container>
+                <ng-template #noPhones><span class="muted">—</span></ng-template>
+              </td>
+              <td>
+                <span *ngIf="c.notes && c.notes.trim().length; else noNotes">{{ c.notes }}</span>
+                <ng-template #noNotes><span class="muted">—</span></ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <p class="empty">No eligible companies found for this event.</p>
+      </ng-template>
+    </div>
+  </div>
+</section>

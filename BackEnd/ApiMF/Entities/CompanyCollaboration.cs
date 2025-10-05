@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using ApiMF.Entities;
 
-namespace ApiMF.Models;
+namespace ApiMF.Entities;
 
 public partial class CompanyCollaboration
 {

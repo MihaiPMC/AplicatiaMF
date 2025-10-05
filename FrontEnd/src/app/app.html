@@ -1,0 +1,30 @@
+<nav class="navbar">
+  <a class="brand gradient-text" routerLink="/">MailFlow</a>
+  <div class="nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/events" routerLinkActive="active">Events</a>
+    <a routerLink="/companies" routerLinkActive="active">Companies</a>
+    <a routerLink="/interactions" routerLinkActive="active">Interactions</a>
+  </div>
+  <div class="spacer"></div>
+
+  <!-- Auth area -->
+  <div *ngIf="!isAuthed(); else authed" class="actions">
+    <a routerLink="/login" routerLinkActive="active">Login</a>
+    <a routerLink="/register" class="btn btn-primary">Register</a>
+  </div>
+  <ng-template #authed>
+    <div class="actions">
+      <span class="user-name">{{ displayName() }}</span>
+      <button class="btn btn-link" (click)="logout()">Logout</button>
+    </div>
+  </ng-template>
+</nav>
+
+<main class="container">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="footer">
+  <div class="inner">© {{ currentYear }} MailFlow – Communication & Outreach</div>
+</footer>

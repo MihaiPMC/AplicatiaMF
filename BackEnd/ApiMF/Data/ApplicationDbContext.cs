@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using ApiMF.Entities;
-using ApiMF.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiMF.Data;
@@ -29,6 +28,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<EventTeamMember> EventTeamMembers { get; set; }
 
+    public virtual DbSet<EventType> EventTypes { get; set; }
+
     public virtual DbSet<OutreachStatus> OutreachStatuses { get; set; }
 
     public virtual DbSet<OutreachTask> OutreachTasks { get; set; }
@@ -38,12 +39,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseNpgsql("Host=192.168.0.55;Port=5432;Database=aplicatiemf;Username=mihai;Password=parola_foarte_forta;SSL Mode=Require;Trust Server Certificate=true");
-            }
-        }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseNpgsql("Host=192.168.0.55;Port=5432;Database=aplicatiemf;Username=mihai;Password=parola_foarte_forta;SSL Mode=Require;Trust Server Certificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -179,8 +176,14 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
+            entity.Property(e => e.EndDate)
+                .HasDefaultValueSql("CURRENT_DATE")
+                .HasColumnName("end_date");
             entity.Property(e => e.EventTypeId).HasColumnName("event_type_id");
             entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.StartDate)
+                .HasDefaultValueSql("CURRENT_DATE")
+                .HasColumnName("start_date");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
@@ -230,6 +233,21 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("event_team_members_user_id_fkey");
+        });
+
+        modelBuilder.Entity<EventType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("event_types_pkey");
+
+            entity.ToTable("event_types", "mf");
+
+            entity.HasIndex(e => e.Code, "event_types_code_key").IsUnique();
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.Code).HasColumnName("code");
+            entity.Property(e => e.Name).HasColumnName("name");
         });
 
         modelBuilder.Entity<OutreachStatus>(entity =>
@@ -328,16 +346,13 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.FirstName).HasColumnName("first_name");
             entity.Property(e => e.LastName).HasColumnName("last_name");
-            entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
-
-            // Reflect unique constraint on email for migrations (enforcement happens in DB)
-            entity.HasIndex(e => e.Email).IsUnique();
         });
 
         OnModelCreatingPartial(modelBuilder);
