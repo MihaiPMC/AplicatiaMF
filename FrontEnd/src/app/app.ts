@@ -14,7 +14,7 @@ export class App {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly title = signal('ASMI M&F');
+  protected readonly title = signal('MailFlow');
   readonly currentYear = new Date().getFullYear();
 
   // Expose auth state

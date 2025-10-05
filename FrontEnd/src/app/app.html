@@ -1,5 +1,5 @@
 <nav class="navbar">
-  <a class="brand" routerLink="/">ASMI M&F</a>
+  <a class="brand gradient-text" routerLink="/">MailFlow</a>
   <div class="nav-links">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
     <a routerLink="/events" routerLinkActive="active">Events</a>
@@ -25,4 +25,6 @@
   <router-outlet></router-outlet>
 </main>
 
-<footer class="footer">© {{ currentYear }} ASMI – Management & Fundraising</footer>
+<footer class="footer">
+  <div class="inner">© {{ currentYear }} MailFlow – Communication & Outreach</div>
+</footer>
