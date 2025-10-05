@@ -1,14 +1,17 @@
-<!-- filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.html -->
 <section class="page">
   <div class="card">
     <div class="toolbar">
-      <h2>Companies</h2>
+      <div>
+        <h2>
+          Companies for {{ eventName() || 'Event' }}<span *ngIf="eventYear()"> {{ eventYear() }}</span>
+        </h2>
+        <p class="helper" *ngIf="eventTypeLabel()">Event type: {{ eventTypeLabel() }}</p>
+      </div>
       <div class="actions">
+        <a class="btn btn-outline" routerLink="/events">Back to events</a>
         <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
       </div>
     </div>
-
-    <p class="helper" *ngIf="!loading() && !error()">List of partner companies and their contact details.</p>
 
     <div class="status" *ngIf="loading()">
       <span class="spinner" aria-hidden="true"></span>
@@ -29,7 +32,6 @@
               <th scope="col">Website</th>
               <th scope="col">Emails</th>
               <th scope="col">Phones</th>
-              <th scope="col">LinkedIn</th>
               <th scope="col">Notes</th>
             </tr>
           </thead>
@@ -53,12 +55,6 @@
                 <ng-template #noPhones><span class="muted">—</span></ng-template>
               </td>
               <td>
-                <ng-container *ngIf="contactLinkedins()[c.id]?.length; else noLinkedin">
-                  <a class="chip" *ngFor="let li of contactLinkedins()[c.id]" [href]="ensureUrl(li)" target="_blank" rel="noopener">{{ li }}</a>
-                </ng-container>
-                <ng-template #noLinkedin><span class="muted">—</span></ng-template>
-              </td>
-              <td>
                 <span *ngIf="c.notes && c.notes.trim().length; else noNotes">{{ c.notes }}</span>
                 <ng-template #noNotes><span class="muted">—</span></ng-template>
               </td>
@@ -67,7 +63,7 @@
         </table>
       </div>
       <ng-template #empty>
-        <p class="empty">No companies found.</p>
+        <p class="empty">No eligible companies found for this event.</p>
       </ng-template>
     </div>
   </div>

@@ -33,7 +33,11 @@
           </thead>
           <tbody>
             <tr *ngFor="let e of events(); trackBy: trackById">
-              <td class="name">{{ e.name }}</td>
+              <td class="name">
+                <a [routerLink]="['/events', e.id, 'companies', e.eventTypeId]" [queryParams]="{ name: e.name, year: e.year }">
+                  {{ e.name }}
+                </a>
+              </td>
               <td>{{ e.year }}</td>
               <td>{{ e.startDate | date: 'mediumDate' }}</td>
               <td>{{ e.endDate   | date: 'mediumDate' }}</td>

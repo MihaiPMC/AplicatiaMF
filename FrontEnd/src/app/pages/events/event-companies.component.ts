@@ -1,6 +1,6 @@
-// filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.ts
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, forkJoin, map, of } from 'rxjs';
 
@@ -33,13 +33,14 @@ interface CompanyContact {
 }
 
 @Component({
-  selector: 'app-companies',
+  selector: 'app-event-companies',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './companies.component.html',
-  styleUrl: './companies.component.css'
+  imports: [CommonModule, RouterLink],
+  templateUrl: './event-companies.component.html',
+  styleUrl: './event-companies.component.css'
 })
-export class CompaniesComponent {
+export class EventCompaniesComponent {
+  private readonly route = inject(ActivatedRoute);
   private readonly http = inject(HttpClient);
 
   readonly loading = signal(true);
@@ -51,8 +52,46 @@ export class CompaniesComponent {
   readonly contactPhones = signal<Record<number, string[]>>({});
   readonly contactLinkedins = signal<Record<number, string[]>>({});
 
+  // Event info from route/query
+  readonly eventId = signal<number | null>(null);
+  readonly eventTypeId = signal<number | null>(null);
+  readonly eventName = signal<string | null>(null);
+  readonly eventYear = signal<number | null>(null);
+
+  // Assumption: event type IDs mapping
+  // 1: AD (Arta-n Dar), 2: BB (Balul Bobocilor), 3: CA (Cariere), 4: Mi (MateInfoUB), 5: SH (Smarthack), 6: ZA (Zilele ASMI)
+  readonly eventTypeMap: Record<number, { code: 'Ad'|'Bb'|'Ca'|'Mi'|'Sh'|'Za', label: string, flag: keyof CompanyItem }> = {
+    1: { code: 'Ad', label: 'Arta-n Dar', flag: 'canContactAd' },
+    2: { code: 'Bb', label: 'Balul Bobocilor', flag: 'canContactBb' },
+    3: { code: 'Ca', label: 'Cariere', flag: 'canContactCa' },
+    4: { code: 'Mi', label: 'MateInfoUB', flag: 'canContactMi' },
+    5: { code: 'Sh', label: 'Smarthack', flag: 'canContactSh' },
+    6: { code: 'Za', label: 'Zilele ASMI', flag: 'canContactZa' },
+  } as const;
+
+  readonly eventTypeLabel = computed(() => {
+    const id = this.eventTypeId();
+    if (!id) return null;
+    return this.eventTypeMap[id]?.label ?? `Type ${id}`;
+  });
+
   constructor() {
-    this.load();
+    this.route.paramMap.subscribe(pm => {
+      const idParam = pm.get('id');
+      const tParam = pm.get('eventTypeId');
+      this.eventId.set(idParam ? +idParam : null);
+      this.eventTypeId.set(tParam ? +tParam : null);
+    });
+
+    this.route.queryParamMap.subscribe(q => {
+      const name = q.get('name');
+      const year = q.get('year');
+      this.eventName.set(name);
+      this.eventYear.set(year ? +year : null);
+    });
+
+    // Trigger load whenever type changes
+    this.route.paramMap.subscribe(() => this.load());
   }
 
   readonly trackById = (_: number, item: CompanyItem) => item.id;
@@ -63,11 +102,39 @@ export class CompaniesComponent {
     return /^https?:\/\//i.test(u) ? u : `https://${u}`;
   }
 
+  private extractValue(c: CompanyContact): string {
+    const v = c.value ?? c.contactValue ?? c.contact ?? c.url ?? c.link ?? c.email ?? c.phone ?? c.address;
+    return (v ?? '').toString().trim();
+  }
+
+  private buildUrl(): string | null {
+    const typeId = this.eventTypeId();
+    if (!typeId) return null;
+    const mapping = this.eventTypeMap[typeId];
+    if (!mapping) {
+      return null;
+    }
+    const url = new URL('http://localhost:5146/api/companies');
+    url.searchParams.set(mapping.flag, 'true');
+    return url.toString();
+  }
+
   load() {
     this.loading.set(true);
     this.error.set(null);
 
-    this.http.get<CompanyItem[]>(`http://localhost:5146/api/companies`).subscribe({
+    const url = this.buildUrl();
+    if (!url) {
+      this.loading.set(false);
+      this.error.set('Unknown or missing event type.');
+      this.companies.set([]);
+      this.contactEmails.set({});
+      this.contactPhones.set({});
+      this.contactLinkedins.set({});
+      return;
+    }
+
+    this.http.get<CompanyItem[]>(url).subscribe({
       next: (data) => {
         const list = Array.isArray(data) ? data.slice() : [];
         list.sort((a, b) => a.name.localeCompare(b.name));
@@ -84,11 +151,6 @@ export class CompaniesComponent {
         this.contactLinkedins.set({});
       }
     });
-  }
-
-  private extractValue(c: CompanyContact): string {
-    const v = c.value ?? c.contactValue ?? c.contact ?? c.url ?? c.link ?? c.email ?? c.phone ?? c.address;
-    return (v ?? '').toString().trim();
   }
 
   private loadContactsForCompanies(list: CompanyItem[]) {
@@ -132,21 +194,5 @@ export class CompaniesComponent {
       this.contactPhones.set(pMap);
       this.contactLinkedins.set(lMap);
     });
-  }
-
-  getAllowedContacts(c: CompanyItem): string[] {
-    const map: [keyof CompanyItem, string][] = [
-      ['canContactAd', 'Ad'],
-      ['canContactBb', 'Bb'],
-      ['canContactCa', 'Ca'],
-      ['canContactMi', 'Mi'],
-      ['canContactSh', 'Sh'],
-      ['canContactZa', 'Za'],
-    ];
-    const out: string[] = [];
-    for (const [key, label] of map) {
-      if (c[key] as unknown as boolean) out.push(label);
-    }
-    return out;
   }
 }

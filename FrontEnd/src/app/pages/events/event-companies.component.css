@@ -1,4 +1,4 @@
-/* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.css */
+/* Styles for the Event Companies page */
 .page { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; }
@@ -22,6 +22,7 @@
 
 .table-wrapper { overflow-x: auto; }
 
-/* Chip for allowed contacts */
+/* Simple chip for allowed contacts */
 .chip { display: inline-block; margin: 0 .35rem .35rem 0; padding: .15rem .45rem; border-radius: 999px; font-size: .8rem;
   background: rgba(255,255,255,.06); border: 1px solid var(--border); }
+
