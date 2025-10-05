@@ -5,7 +5,7 @@ using ApiMF.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiMF.Controlers;
+namespace ApiMF.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
