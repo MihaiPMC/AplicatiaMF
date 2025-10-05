@@ -7,13 +7,6 @@
     <a routerLink="/interactions" routerLinkActive="active">Interactions</a>
   </div>
   <div class="spacer"></div>
-  <div class="actions" *ngIf="!isAuthed; else authed">
-    <a class="btn btn-ghost" routerLink="/login">Login</a>
-    <a class="btn btn-outline" routerLink="/register">Register</a>
-  </div>
-  <ng-template #authed>
-    <button class="btn btn-outline" (click)="logout()">Logout</button>
-  </ng-template>
 </nav>
 
 <main class="container">
