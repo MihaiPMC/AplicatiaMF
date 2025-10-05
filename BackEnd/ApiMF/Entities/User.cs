@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ApiMF.Models;
 
 namespace ApiMF.Entities;
 
@@ -12,13 +11,13 @@ public partial class User
 
     public string LastName { get; set; } = null!;
 
-    public string Email { get; set; } = null!;
-
     public string PasswordHash { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public string Email { get; set; } = null!;
 
     public virtual ICollection<EventTeamMember> EventTeamMemberReportsToUsers { get; set; } = new List<EventTeamMember>();
 

@@ -1,7 +1,23 @@
 /* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.css */
-.page { max-width: 1000px; margin: 2rem auto; }
-.table-wrapper { overflow-x: auto; }
-.table { width: 100%; border-collapse: collapse; }
-.table th, .table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
-.table th { background: #f3f4f6; }
+.page { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; }
+.toolbar h2 { margin: 0; font-size: 1.2rem; }
+.actions { display: flex; gap: .5rem; }
+
+.status { display: flex; align-items: center; gap: .6rem; margin: .75rem 0; color: var(--muted); }
+.status.error { color: #fca5a5; display: flex; gap: .75rem; align-items: center; }
+
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.2);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.table .name { font-weight: 600; }
+.muted { color: var(--muted); }
+.empty { color: var(--muted); margin: .75rem 0; }
+
+.table-wrapper { overflow-x: auto; }

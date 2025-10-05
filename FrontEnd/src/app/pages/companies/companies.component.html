@@ -1,29 +1,60 @@
 <!-- filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.html -->
-<section class="card">
-  <h2>Companies</h2>
-  <p class="helper">Preview of companies with contact info and last interaction.</p>
-  <div class="table-wrapper">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Company</th>
-          <th>Contact</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Last interaction</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (c of companies; track c.email) {
-          <tr>
-            <td>{{ c.name }}</td>
-            <td>{{ c.contact }}</td>
-            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
-            <td><a href="tel:{{ c.phone }}">{{ c.phone }}</a></td>
-            <td>{{ c.lastInteraction }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+<section class="page">
+  <div class="card">
+    <div class="toolbar">
+      <h2>Companies</h2>
+      <div class="actions">
+        <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
+      </div>
+    </div>
+
+    <p class="helper" *ngIf="!loading() && !error()">List of partner companies and how we can contact them.</p>
+
+    <div class="status" *ngIf="loading()">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Loading companies…</span>
+    </div>
+
+    <div class="status error" *ngIf="!loading() && error() as err">
+      <span>Failed to load companies: {{ err }}</span>
+      <button class="btn btn-outline" (click)="load()">Try again</button>
+    </div>
+
+    <div *ngIf="!loading() && !error()">
+      <div class="table-wrapper" *ngIf="companies().length; else empty">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Company</th>
+              <th scope="col">Website</th>
+              <th scope="col">Allowed contacts</th>
+              <th scope="col">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of companies(); trackBy: trackById">
+              <td class="name">{{ c.name }}</td>
+              <td>
+                <a *ngIf="c.website; else noWeb" [href]="c.website!" target="_blank" rel="noopener">{{ c.website }}</a>
+                <ng-template #noWeb><span class="muted">—</span></ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="getAllowedContacts(c).length; else noneAllowed">
+                  <span class="chip" *ngFor="let tag of getAllowedContacts(c); let last = last">{{ tag }}</span>
+                </ng-container>
+                <ng-template #noneAllowed><span class="muted">None</span></ng-template>
+              </td>
+              <td>
+                <span *ngIf="c.notes && c.notes.trim().length; else noNotes">{{ c.notes }}</span>
+                <ng-template #noNotes><span class="muted">—</span></ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <p class="empty">No companies found.</p>
+      </ng-template>
+    </div>
   </div>
 </section>

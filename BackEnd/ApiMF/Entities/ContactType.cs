@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ApiMF.Models;
+namespace ApiMF.Entities;
 
 public partial class ContactType
 {

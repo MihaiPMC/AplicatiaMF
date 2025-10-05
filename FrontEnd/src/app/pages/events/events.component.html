@@ -1,10 +1,49 @@
 <!-- filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/events/events.component.html -->
-<section class="card">
-  <h2>Select event to work on</h2>
-  <p class="helper">Pick the event you're focusing on. This is placeholder data.</p>
-  <ul class="list">
-    <li>Gala 2025</li>
-    <li>Tech Conference</li>
-    <li>Charity Marathon</li>
-  </ul>
+<section class="page">
+  <div class="card">
+    <div class="toolbar">
+      <h2>Active Events</h2>
+      <div class="actions">
+        <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
+      </div>
+    </div>
+
+    <p class="helper" *ngIf="!loading() && !error()">Below are the currently active events.</p>
+
+    <div class="status" *ngIf="loading()">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Loading events…</span>
+    </div>
+
+    <div class="status error" *ngIf="!loading() && error() as err">
+      <span>Failed to load events: {{ err }}</span>
+      <button class="btn btn-outline" (click)="load()">Try again</button>
+    </div>
+
+    <div *ngIf="!loading() && !error()">
+      <div class="table-wrapper" *ngIf="events().length; else empty">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Year</th>
+              <th scope="col">Start date</th>
+              <th scope="col">End date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of events(); trackBy: trackById">
+              <td class="name">{{ e.name }}</td>
+              <td>{{ e.year }}</td>
+              <td>{{ e.startDate | date: 'mediumDate' }}</td>
+              <td>{{ e.endDate   | date: 'mediumDate' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <p class="empty">No active events found.</p>
+      </ng-template>
+    </div>
+  </div>
 </section>

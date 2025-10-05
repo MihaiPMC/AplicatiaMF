@@ -1,4 +1,20 @@
 /* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/events/events.component.css */
-.page { max-width: 800px; margin: 2rem auto; }
-.list { margin-top: 1rem; }
+.page { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; }
+.toolbar h2 { margin: 0; font-size: 1.2rem; }
+.actions { display: flex; gap: .5rem; }
+
+.status { display: flex; align-items: center; gap: .6rem; margin: .75rem 0; color: var(--muted); }
+.status.error { color: #fca5a5; display: flex; gap: .75rem; align-items: center; }
+
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.2);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.table .name { font-weight: 600; }
+.empty { color: var(--muted); margin: .75rem 0; }
