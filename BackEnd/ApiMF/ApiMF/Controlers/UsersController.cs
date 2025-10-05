@@ -1,10 +1,9 @@
-using System.Security.Cryptography;
-using System.Text;
-using ApiMF.Data;
-using ApiMF.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Npgsql; // for PostgresException
+using ApiMF.Models.Dtos;
+using ApiMF.Application.Users.Commands.CreateUser;
+using ApiMF.Application.Users.Queries.GetUsers;
+using ApiMF.Application.Users.Queries.GetUserById;
 
 namespace ApiMF.Controllers;
 
@@ -12,11 +11,11 @@ namespace ApiMF.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IMediator _mediator;
 
-    public UsersController(ApplicationDbContext db)
+    public UsersController(IMediator mediator)
     {
-        _db = db;
+        _mediator = mediator;
     }
 
     // GET: api/users
@@ -24,20 +23,8 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
-        var users = await _db.Users
-            .AsNoTracking()
-            .Select(u => new UserDto
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt
-            })
-            .ToListAsync();
-
-        return Ok(users);
+        var result = await _mediator.Send(new GetUsersQuery());
+        return Ok(result);
     }
 
     // GET: api/users/{id}
@@ -46,21 +33,10 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserDto>> GetUserById(long id)
     {
-        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+        var user = await _mediator.Send(new GetUserByIdQuery(id));
         if (user == null)
-        {
             return NotFound();
-        }
-
-        return Ok(new UserDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
-        });
+        return Ok(user);
     }
 
     // POST: api/users
@@ -69,7 +45,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserDto>> CreateUser([FromBody] CreateUserRequest request)
     {
-        // Basic validation
+        // Basic validation here to return 400 with details
         if (string.IsNullOrWhiteSpace(request.FirstName))
             ModelState.AddModelError(nameof(request.FirstName), "First name is required.");
         if (string.IsNullOrWhiteSpace(request.LastName))
@@ -82,91 +58,31 @@ public class UsersController : ControllerBase
         if (!ModelState.IsValid)
             return ValidationProblem(ModelState);
 
-        // Best-effort check to provide a nicer error before hitting DB constraint
-        var normalizedEmail = request.Email.Trim();
-        var emailExists = await _db.Users.AnyAsync(u => EF.Functions.ILike(u.Email, normalizedEmail));
-        if (emailExists)
-        {
-            ModelState.AddModelError(nameof(request.Email), "A user with this email already exists.");
-            return ValidationProblem(ModelState);
-        }
+        var cmd = new CreateUserCommand(
+            request.FirstName,
+            request.LastName,
+            request.Email,
+            request.Password
+        );
 
-        var passwordHash = HashPasswordPbkdf2(request.Password);
-
-        var user = new User
-        {
-            FirstName = request.FirstName.Trim(),
-            LastName = request.LastName.Trim(),
-            Email = normalizedEmail,
-            PasswordHash = passwordHash,
-        };
-
-        _db.Users.Add(user);
         try
         {
-            await _db.SaveChangesAsync();
+            var dto = await _mediator.Send(cmd);
+            return CreatedAtAction(nameof(GetUserById), new { id = dto.Id }, dto);
         }
-        catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+        catch (ValidationException vex)
         {
-            // Handle race conditions where another request inserted the same email concurrently
-            ModelState.AddModelError(nameof(request.Email), "A user with this email already exists.");
+            ModelState.AddModelError(nameof(request.Email), vex.Message);
             return ValidationProblem(ModelState);
         }
-
-        var dto = new UserDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
-        };
-
-        return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, dto);
     }
 
-    private static bool IsUniqueViolation(DbUpdateException ex)
-    {
-        // PostgreSQL unique violation SQLSTATE code is 23505
-        return ex.InnerException is PostgresException pg && pg.SqlState == PostgresErrorCodes.UniqueViolation;
-    }
-
-    private static string HashPasswordPbkdf2(string password)
-    {
-        // PBKDF2 with HMACSHA256
-        const int iterations = 600_000;
-        const int saltSize = 16; // 128-bit
-        const int keySize = 32;  // 256-bit
-
-        var salt = RandomNumberGenerator.GetBytes(saltSize);
-        var hash = Rfc2898DeriveBytes.Pbkdf2(
-            Encoding.UTF8.GetBytes(password),
-            salt,
-            iterations,
-            HashAlgorithmName.SHA256,
-            keySize);
-
-        // Store as: pbkdf2$<iterations>$<salt_b64>$<hash_b64>
-        return $"pbkdf2${iterations}${Convert.ToBase64String(salt)}${Convert.ToBase64String(hash)}";
-    }
-
-    // DTOs
+    // DTO for input only
     public class CreateUserRequest
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-    }
-
-    public class UserDto
-    {
-        public long Id { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
     }
 }

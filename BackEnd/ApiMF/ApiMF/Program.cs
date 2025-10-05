@@ -1,5 +1,6 @@
 using ApiMF.Data;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,12 @@ builder.Services.AddOpenApi();
 
 // Add Controllers
 builder.Services.AddControllers();
+
+// Register MediatR handlers in this assembly
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// Remove AutoMapper registration to avoid version compatibility issues
+// builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 

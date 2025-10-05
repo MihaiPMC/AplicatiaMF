@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ApiMF.Models;
 
-namespace ApiMF.Models;
+namespace ApiMF.Entities;
 
 public partial class User
 {
