@@ -135,7 +135,7 @@ public class UsersController : ControllerBase
     private static string HashPasswordPbkdf2(string password)
     {
         // PBKDF2 with HMACSHA256
-        const int iterations = 100_000;
+        const int iterations = 600_000;
         const int saltSize = 16; // 128-bit
         const int keySize = 32;  // 256-bit
 
