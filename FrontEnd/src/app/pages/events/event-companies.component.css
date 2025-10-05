@@ -1,5 +1,6 @@
 /* Styles for the Event Companies page */
-.page { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+.page { max-width: 1600px; margin: 2rem auto; padding: 0 1rem; }
+.page--full{ max-width:none; width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); padding-left:1rem; padding-right:1rem; }
 
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; }
 .toolbar h2 { margin: 0; font-size: 1.2rem; }
@@ -22,7 +23,9 @@
 
 .table-wrapper { overflow-x: auto; }
 
+/* Ensure the actions column fits buttons without wrapping */
+.table th.actions-col, .table td.actions-col { white-space: nowrap; text-align: right; }
+
 /* Simple chip for allowed contacts */
 .chip { display: inline-block; margin: 0 .35rem .35rem 0; padding: .15rem .45rem; border-radius: 999px; font-size: .8rem;
   background: rgba(255,255,255,.06); border: 1px solid var(--border); }
-
