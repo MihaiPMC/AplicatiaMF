@@ -31,7 +31,6 @@ public class UsersController : ControllerBase
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Email = u.Email,
-                PasswordHash = u.PasswordHash,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt
             })
