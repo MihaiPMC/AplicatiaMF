@@ -81,6 +81,7 @@ function App() {
           isAuthenticated={isAuthenticated}
           onLogin={handleShowLogin}
           onLogout={handleLogout}
+          onLogoClick={handleShowHome}
         />
         <nav className="app-nav">
           <button onClick={handleShowHome} className="nav-btn active">
@@ -163,6 +164,7 @@ function App() {
           isAuthenticated={isAuthenticated}
           onLogin={handleShowLogin}
           onLogout={handleLogout}
+          onLogoClick={handleShowHome}
         />
         <nav className="app-nav">
           <button onClick={handleShowHome} className="nav-btn">
@@ -187,6 +189,7 @@ function App() {
         isAuthenticated={isAuthenticated}
         onLogin={handleShowLogin}
         onLogout={handleLogout}
+        onLogoClick={handleShowHome}
       />
       <nav className="app-nav">
         <button onClick={handleShowHome} className="nav-btn">

@@ -12,6 +12,7 @@ export interface HeaderProps {
   isAuthenticated: boolean;
   onLogin: () => void;
   onLogout: () => void;
+  onLogoClick?: () => void;
 }
 
 interface NavItem {
@@ -20,7 +21,7 @@ interface NavItem {
   roles: string[];
 }
 
-const Header: React.FC<HeaderProps> = ({ user, isAuthenticated, onLogin, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ user, isAuthenticated, onLogin, onLogout, onLogoClick }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems: NavItem[] = [
@@ -41,8 +42,13 @@ const Header: React.FC<HeaderProps> = ({ user, isAuthenticated, onLogin, onLogou
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
-          <img src="/logo512.png" alt="Logo" className={styles.logoImage} />
-          <span className={styles.logoText}>MF-App</span>
+          <button
+            onClick={onLogoClick}
+            className={styles.logoButton}
+            aria-label="Go to home page"
+          >
+            <span className={styles.logoText}>MF-App</span>
+          </button>
         </div>
 
         <nav className={`${styles.nav} ${isMobileMenuOpen ? styles.navOpen : ''}`}>
