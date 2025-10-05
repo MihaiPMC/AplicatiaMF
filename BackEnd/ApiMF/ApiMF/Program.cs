@@ -1,8 +1,21 @@
+using ApiMF.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure PostgreSQL EF Core (Database First)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Add Controllers
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -13,6 +26,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Map attribute-routed controllers (e.g., api/users)
+app.MapControllers();
 
 var summaries = new[]
 {

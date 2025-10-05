@@ -4,3 +4,23 @@ GET {{ApiMF_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+### Get all users
+GET {{ApiMF_HostAddress}}/api/users
+Accept: application/json
+
+### Get user by id
+GET {{ApiMF_HostAddress}}/api/users/1
+Accept: application/json
+
+### Create user
+POST {{ApiMF_HostAddress}}/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "P@ssw0rd123"
+}
