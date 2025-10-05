@@ -4,8 +4,9 @@ import Header, { User } from './components/Header/Header';
 import Login, { LoginFormData } from './components/Login/Login';
 import Register, { RegisterFormData } from './components/Register/Register';
 import Templates from './components/Templates/Templates';
+import Firms from './components/Firms/Firms';
 
-type AppView = 'home' | 'login' | 'app' | 'register' | 'templates';
+type AppView = 'home' | 'login' | 'app' | 'register' | 'templates' | 'firms';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('home');
@@ -73,6 +74,10 @@ function App() {
     setCurrentView('home');
   };
 
+  const handleShowFirms = () => {
+    setCurrentView('firms');
+  };
+
   if (currentView === 'home') {
     return (
       <div className="App">
@@ -90,6 +95,11 @@ function App() {
           <button onClick={handleShowDashboard} className="nav-btn">
             Dashboard
           </button>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <button onClick={handleShowFirms} className="nav-btn">
+              Firms
+            </button>
+          )}
           <button onClick={handleShowTemplates} className="nav-btn">
             Templates
           </button>
@@ -170,11 +180,47 @@ function App() {
           <button onClick={handleShowDashboard} className="nav-btn">
             Dashboard
           </button>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <button onClick={handleShowFirms} className="nav-btn">
+              Firms
+            </button>
+          )}
           <button onClick={handleShowTemplates} className="nav-btn active">
             Templates
           </button>
         </nav>
         <Templates userRole={user?.role || 'volunteer'} />
+      </div>
+    );
+  }
+
+  if (currentView === 'firms') {
+    return (
+      <div className="App">
+        <Header
+          user={user}
+          isAuthenticated={isAuthenticated}
+          onLogin={handleShowLogin}
+          onLogout={handleLogout}
+          onLogoClick={handleShowHome}
+        />
+        <nav className="app-nav">
+          <button onClick={handleShowHome} className="nav-btn">
+            Home
+          </button>
+          <button onClick={handleShowDashboard} className="nav-btn">
+            Dashboard
+          </button>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <button onClick={handleShowFirms} className="nav-btn active">
+              Firms
+            </button>
+          )}
+          <button onClick={handleShowTemplates} className="nav-btn">
+            Templates
+          </button>
+        </nav>
+        <Firms userRole={user?.role || 'volunteer'} />
       </div>
     );
   }
@@ -195,6 +241,11 @@ function App() {
         <button onClick={handleShowDashboard} className="nav-btn active">
           Dashboard
         </button>
+        {(user?.role === 'admin' || user?.role === 'manager') && (
+          <button onClick={handleShowFirms} className="nav-btn">
+            Firms
+          </button>
+        )}
         <button onClick={handleShowTemplates} className="nav-btn">
           Templates
         </button>
