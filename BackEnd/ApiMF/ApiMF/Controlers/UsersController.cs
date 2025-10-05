@@ -83,8 +83,8 @@ public class UsersController : ControllerBase
             return ValidationProblem(ModelState);
 
         // Best-effort check to provide a nicer error before hitting DB constraint
-        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var emailExists = await _db.Users.AnyAsync(u => u.Email == normalizedEmail);
+        var normalizedEmail = request.Email.Trim();
+        var emailExists = await _db.Users.AnyAsync(u => EF.Functions.ILike(u.Email, normalizedEmail));
         if (emailExists)
         {
             ModelState.AddModelError(nameof(request.Email), "A user with this email already exists.");
