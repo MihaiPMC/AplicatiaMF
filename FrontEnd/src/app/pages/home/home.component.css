@@ -1,0 +1,11 @@
+/* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/home/home.component.css */
+.home {
+  margin-top: 2rem;
+  text-align: center;
+}
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}

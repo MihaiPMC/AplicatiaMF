@@ -1,0 +1,29 @@
+<!-- filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.html -->
+<section class="card">
+  <h2>Companies</h2>
+  <p class="helper">Preview of companies with contact info and last interaction.</p>
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Contact</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Last interaction</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of companies; track c.email) {
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.contact }}</td>
+            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+            <td><a href="tel:{{ c.phone }}">{{ c.phone }}</a></td>
+            <td>{{ c.lastInteraction }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -21,9 +21,9 @@ builder.Services.AddControllers();
 // CORS: allow requests from local frontend dev server
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocal3000", policy =>
+    options.AddPolicy("AllowLocal4200", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -46,7 +46,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Apply CORS before mapping controllers
-app.UseCors("AllowLocal3000");
+app.UseCors("AllowLocal4200");
 
 // Map attribute-routed controllers (e.g., api/users)
 app.MapControllers();

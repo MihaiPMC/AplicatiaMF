@@ -1,0 +1,7 @@
+/* filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/companies/companies.component.css */
+.page { max-width: 1000px; margin: 2rem auto; }
+.table-wrapper { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
+.table th { background: #f3f4f6; }
+

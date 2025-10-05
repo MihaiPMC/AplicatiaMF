@@ -1,0 +1,29 @@
+<!-- filepath: /Users/mihai/Desktop/ProiectMF/AplicatiaMF/FrontEnd/src/app/pages/register/register.component.html -->
+<section class="card card--md">
+  <h2>Register</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-row">
+      <label>
+        First name
+        <input type="text" formControlName="firstName" placeholder="John" />
+      </label>
+      <label>
+        Last name
+        <input type="text" formControlName="lastName" placeholder="Doe" />
+      </label>
+    </div>
+    <label>
+      Email
+      <input type="email" formControlName="email" placeholder="you@example.com" />
+    </label>
+    <label>
+      Password
+      <input type="password" formControlName="password" placeholder="Password123" />
+    </label>
+
+    <button class="btn btn-primary" type="submit" [disabled]="loading()">{{ loading() ? 'Creating…' : 'Create account' }}</button>
+  </form>
+  <p class="helper">Already have an account? <a routerLink="/login">Login</a></p>
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+  <p class="success" *ngIf="success()">{{ success() }}</p>
+</section>
